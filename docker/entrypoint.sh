@@ -46,7 +46,17 @@ php artisan storage:link --force --no-interaction
 
 php artisan migrate --force --no-interaction
 
-if php artisan tinker --execute='exit(\App\Models\User::query()->exists() ? 0 : 1);' >/dev/null 2>&1; then
+USER_COUNT=$(php -r "
+    \$host = getenv('DB_HOST') ?: 'postgres';
+    \$port = getenv('DB_PORT') ?: '5432';
+    \$db = getenv('DB_DATABASE') ?: 'inventory';
+    \$user = getenv('DB_USERNAME') ?: 'inventory';
+    \$pass = getenv('DB_PASSWORD') ?: 'secret';
+    \$pdo = new PDO(\"pgsql:host=\$host;port=\$port;dbname=\$db\", \$user, \$pass);
+    echo (int) \$pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
+")
+
+if [ "${USER_COUNT:-0}" -gt 0 ]; then
     echo "Database already seeded."
 else
     echo "Running database seeders..."
