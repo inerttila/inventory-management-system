@@ -1,5 +1,5 @@
 # Stage 1: Build frontend assets (requires Composer vendor for PowerGrid CSS)
-FROM php:8.2-cli-bookworm AS frontend
+FROM php:8.3-cli-bookworm AS frontend
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -28,7 +28,7 @@ COPY public ./public
 RUN npm run build
 
 # Stage 2: Application runtime (PHP + Nginx + MariaDB)
-FROM php:8.2-fpm-bookworm
+FROM php:8.3-fpm-bookworm
 
 ARG DEBIAN_FRONTEND=noninteractive
 
