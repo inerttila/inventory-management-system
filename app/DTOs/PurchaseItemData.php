@@ -7,8 +7,8 @@ class PurchaseItemData
     public function __construct(
         public int $product_id,
         public int $quantity,
-        public int $unit_price,
-        public ?int $selling_price,
+        public float $unit_price,
+        public ?float $selling_price,
     ) {}
 
     public static function fromArray(array $data): self
@@ -16,8 +16,10 @@ class PurchaseItemData
         return new self(
             product_id: (int) $data['product_id'],
             quantity: (int) $data['quantity'],
-            unit_price: (int) $data['unit_price'],
-            selling_price: $data['selling_price'],
+            unit_price: (float) $data['unit_price'],
+            selling_price: isset($data['selling_price']) && $data['selling_price'] !== '' && $data['selling_price'] !== null
+                ? (float) $data['selling_price']
+                : null,
         );
     }
 

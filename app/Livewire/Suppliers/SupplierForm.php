@@ -7,6 +7,7 @@ use Livewire\Component;
 use App\Models\Supplier;
 use App\DTOs\SupplierData;
 use Livewire\Attributes\On;
+use Illuminate\Validation\Rule;
 use App\Services\SupplierService;
 
 class SupplierForm extends Component
@@ -32,7 +33,12 @@ class SupplierForm extends Component
         return [
             'name' => ['required', 'string', 'max:255'],
             'contact_person' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255', 'unique:suppliers,email,' . ($this->supplier?->id)],
+            'email' => [
+                'nullable',
+                'email',
+                'max:255',
+                Rule::unique('suppliers', 'email')->ignore($this->supplier?->id),
+            ],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:1000'],

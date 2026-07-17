@@ -22,11 +22,11 @@ class SaleItem extends Model
     ];
 
     protected $casts = [
-        'cost_price' => 'integer',
-        'unit_price' => 'integer',
-        'discount' => 'integer',
-        'final_price' => 'integer',
-        'subtotal' => 'integer',
+        'cost_price' => 'float',
+        'unit_price' => 'float',
+        'discount' => 'float',
+        'final_price' => 'float',
+        'subtotal' => 'float',
         'quantity' => 'integer',
     ];
 

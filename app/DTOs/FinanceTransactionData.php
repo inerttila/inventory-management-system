@@ -9,7 +9,7 @@ readonly class FinanceTransactionData
     public function __construct(
         public Carbon $transaction_date,
         public int $finance_category_id,
-        public int $amount,
+        public float $amount,
         public ?string $description,
         public ?string $external_reference,
         public int $created_by,
@@ -32,7 +32,7 @@ readonly class FinanceTransactionData
         return new self(
             transaction_date: Carbon::parse($data['transaction_date']),
             finance_category_id: (int) $data['finance_category_id'],
-            amount: (int) $data['amount'],
+            amount: (float) $data['amount'],
             description: $data['description'] ?? null,
             external_reference: $data['external_reference'] ?? null,
             created_by: (int) ($data['created_by'] ?? \Illuminate\Support\Facades\Auth::id()),

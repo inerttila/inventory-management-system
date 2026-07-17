@@ -5,8 +5,9 @@ namespace App\Livewire\Customers;
 use Exception;
 use Livewire\Component;
 use App\Models\Customer;
-use App\DTOs\CustomerData;
+use App\DTOs\CustomerData; 
 use Livewire\Attributes\On;
+use Illuminate\Validation\Rule;
 use App\Services\CustomerService;
 
 class CustomerForm extends Component
@@ -29,7 +30,12 @@ class CustomerForm extends Component
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255', 'unique:customers,email,' . ($this->customer?->id)],
+            'email' => [
+                'nullable',
+                'email',
+                'max:255',
+                Rule::unique('customers', 'email')->ignore($this->customer?->id),
+            ],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:1000'],

@@ -1,51 +1,60 @@
 <x-modal name="setting-form-modal" :title="''" maxWidth="2xl">
     <div class="p-6">
-        <!-- Custom Header -->
         <div class="mb-6 space-y-1.5 text-center sm:text-left border-b border-gray-200 pb-4">
             <h3 class="text-lg font-semibold leading-none tracking-tight text-foreground">
-                {{ __('Edit Setting') }}
+                {{ $isCreating ? __('Create Setting') : __('Edit Setting') }}
             </h3>
             <p class="text-sm text-muted-foreground">
-                {{ __('Update the value of this setting.') }}
+                {{ $isCreating ? __('Add a new application setting.') : __('Update the value of this setting.') }}
             </p>
         </div>
 
         <form wire:submit="save" class="space-y-4">
-            <!-- Label (Readonly) -->
             <div class="space-y-2">
                 <x-input-label for="key" :value="__('Setting Name')" />
-                <div class="px-3 py-2 text-sm font-medium border rounded-md border-input bg-muted/50 text-foreground">
-                    {{ $label }}
-                </div>
+                @if($isCreating)
+                    <x-text-input
+                        id="key"
+                        class="block w-full"
+                        type="text"
+                        wire:model="key"
+                        placeholder="e.g. currency_symbol"
+                    />
+                    <p class="text-xs text-muted-foreground">Use snake_case (lowercase, underscores).</p>
+                    <x-input-error :messages="$errors->get('key')" />
+                @else
+                    <div class="px-3 py-2 text-sm font-medium border rounded-md border-input bg-muted/50 text-foreground">
+                        {{ $label }}
+                    </div>
+                @endif
             </div>
 
-            <!-- Value -->
             <div class="space-y-2">
                 <x-input-label for="value" :value="__('Value')" />
-                
-                @if($key === 'currency_position')
+
+                @if(!$isCreating && $key === 'currency_position')
                     <select id="value" wire:model="value" class="block w-full rounded-md border-input bg-background shadow-sm focus:border-ring focus:ring-ring sm:text-sm">
-                        <option value="left">Left (Example: Rp 10.000)</option>
-                        <option value="right">Right (Example: 10.000 Rp)</option>
+                        <option value="left">Left (Example: $ 10.00)</option>
+                        <option value="right">Right (Example: 10.00 $)</option>
                     </select>
-                @elseif($key === 'currency_fraction_digits')
-                    <input 
-                        type="number" 
-                        id="value" 
-                        wire:model="value" 
+                @elseif(!$isCreating && $key === 'currency_fraction_digits')
+                    <input
+                        type="number"
+                        id="value"
+                        wire:model="value"
                         min="0"
                         max="4"
-                        class="block w-full rounded-md border-input bg-background shadow-sm focus:border-ring focus:ring-ring sm:text-sm" 
+                        class="block w-full rounded-md border-input bg-background shadow-sm focus:border-ring focus:ring-ring sm:text-sm"
                         placeholder="0 for IDR, 2 for USD"
                     >
-                @elseif(in_array($key, ['currency_thousand_separator', 'currency_decimal_separator']))
+                @elseif(!$isCreating && in_array($key, ['currency_thousand_separator', 'currency_decimal_separator']))
                     <select id="value" wire:model="value" class="block w-full rounded-md border-input bg-background shadow-sm focus:border-ring focus:ring-ring sm:text-sm">
                         <option value=".">Dot (.)</option>
                         <option value=",">Comma (,)</option>
                         <option value=" ">Space ( )</option>
                         <option value="">None</option>
                     </select>
-                @elseif(in_array($key, ['store_address']))
+                @elseif(!$isCreating && in_array($key, ['store_address']))
                     <textarea
                         id="value"
                         wire:model="value"
@@ -54,18 +63,17 @@
                         placeholder="Enter value..."
                     ></textarea>
                 @else
-                    <input 
-                        type="text" 
-                        id="value" 
-                        wire:model="value" 
-                        class="block w-full rounded-md border-input bg-background shadow-sm focus:border-ring focus:ring-ring sm:text-sm" 
+                    <input
+                        type="text"
+                        id="value"
+                        wire:model="value"
+                        class="block w-full rounded-md border-input bg-background shadow-sm focus:border-ring focus:ring-ring sm:text-sm"
                         placeholder="Enter value..."
                     >
                 @endif
                 <x-input-error :messages="$errors->get('value')" />
             </div>
 
-            <!-- Actions -->
             <div class="mt-6 flex justify-end gap-3 border-t border-gray-200 pt-4">
                 <x-secondary-button type="button" x-on:click="$dispatch('close-modal', { name: 'setting-form-modal' })">
                     {{ __('Cancel') }}
@@ -77,7 +85,7 @@
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     <x-heroicon-o-check wire:loading.remove wire:target="save" class="w-4 h-4 mr-2" />
-                    {{ __('Save Changes') }}
+                    {{ $isCreating ? __('Create') : __('Save Changes') }}
                 </x-primary-button>
             </div>
         </form>

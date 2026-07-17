@@ -33,12 +33,12 @@ class Sale extends Model
         'sale_date' => 'datetime',
         'status' => SaleStatus::class,
         'payment_method' => PaymentMethod::class,
-        'subtotal' => 'integer',
-        'global_discount' => 'integer',
-        'total_discount' => 'integer',
-        'total' => 'integer',
-        'cash_received' => 'integer',
-        'change' => 'integer',
+        'subtotal' => 'float',
+        'global_discount' => 'float',
+        'total_discount' => 'float',
+        'total' => 'float',
+        'cash_received' => 'float',
+        'change' => 'float',
     ];
 
     public function items(): HasMany
