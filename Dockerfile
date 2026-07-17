@@ -29,24 +29,32 @@ COPY public ./public
 
 RUN npm run build
 
-# Stage 2: Application runtime (PHP + Nginx)
-FROM php:8.3-fpm-bookworm
+# Stage 2: Application runtime (PHP + Nginx) — Alpine avoids flaky Debian CDN mirrors
+FROM php:8.3-fpm-alpine
 
-ARG DEBIAN_FRONTEND=noninteractive
-
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-
-RUN set -eux; \
-    for attempt in 1 2 3; do \
-        apt-get update \
-        && apt-get install -y --no-install-recommends nginx supervisor curl git unzip \
-        && install-php-extensions pdo_pgsql pgsql mbstring exif pcntl bcmath gd zip \
-        && break; \
-        echo "apt install attempt ${attempt} failed, retrying..."; \
-        sleep 10; \
-    done; \
-    apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    curl \
+    git \
+    unzip \
+    postgresql-dev \
+    libzip-dev \
+    oniguruma-dev \
+    freetype-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j"$(nproc)" \
+    pdo_pgsql \
+    pgsql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -62,11 +70,12 @@ RUN composer dump-autoload --optimize \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-COPY docker/nginx/default.conf /etc/nginx/sites-available/default
-COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
+COPY docker/supervisor/supervisord.conf /etc/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
+    && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 

@@ -56,4 +56,4 @@ chown -R www-data:www-data storage bootstrap/cache
 
 echo "Application is ready at ${APP_URL:-http://localhost:8080}"
 
-exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+exec /usr/bin/supervisord -c /etc/supervisord.conf
