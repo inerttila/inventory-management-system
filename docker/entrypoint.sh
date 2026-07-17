@@ -22,35 +22,22 @@ if ! grep -q '^APP_KEY=base64:' .env; then
     php artisan key:generate --force --no-interaction
 fi
 
-# Initialize MariaDB data directory on first run
-if [ ! -d "/var/lib/mysql/mysql" ]; then
-    echo "Initializing MariaDB..."
-    mariadb-install-db --user=mysql --datadir=/var/lib/mysql > /dev/null
-fi
-
-# Start MariaDB temporarily for database setup
-echo "Starting MariaDB for setup..."
-mysqld --user=mysql --datadir=/var/lib/mysql --skip-networking &
-MYSQL_PID=$!
-
+# Wait for PostgreSQL container
+echo "Waiting for PostgreSQL..."
 for i in $(seq 1 30); do
-    if mariadb-admin ping --silent 2>/dev/null; then
+    if php -r "
+        \$host = getenv('DB_HOST') ?: 'postgres';
+        \$port = getenv('DB_PORT') ?: '5432';
+        \$db = getenv('DB_DATABASE') ?: 'inventory';
+        \$user = getenv('DB_USERNAME') ?: 'inventory';
+        \$pass = getenv('DB_PASSWORD') ?: 'secret';
+        new PDO(\"pgsql:host=\$host;port=\$port;dbname=\$db\", \$user, \$pass);
+    " 2>/dev/null; then
+        echo "PostgreSQL is ready."
         break
     fi
-    sleep 1
+    sleep 2
 done
-
-DB_NAME="${DB_DATABASE:-inventory}"
-DB_USER="${DB_USERNAME:-inventory}"
-DB_PASS="${DB_PASSWORD:-secret}"
-
-mariadb -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;"
-mariadb -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';"
-mariadb -e "GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';"
-mariadb -e "FLUSH PRIVILEGES;"
-
-kill "$MYSQL_PID" 2>/dev/null || true
-wait "$MYSQL_PID" 2>/dev/null || true
 
 # Laravel setup
 php artisan package:discover --ansi --no-interaction

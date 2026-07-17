@@ -50,7 +50,7 @@ A robust, enterprise-grade **Inventory Management System** built with **Laravel 
 
 ### Option A: Docker (Recommended)
 
-Run the entire stack — **Nginx, PHP, frontend assets, and MariaDB** — in a single container with one command. No local PHP, Composer, Node, or MySQL installation required.
+Run the entire stack — **Nginx, PHP, frontend assets, and PostgreSQL** — with one command. No local PHP, Composer, Node, or database installation required.
 
 #### Prerequisites
 - [Docker](https://docs.docker.com/get-docker/) 20.10+
@@ -64,7 +64,7 @@ Run the entire stack — **Nginx, PHP, frontend assets, and MariaDB** — in a s
     cd inventory-management-system
     ```
 
-2. **Build and start the container:**
+2. **Build and start the containers:**
     ```bash
     docker compose up --build -d
     ```
@@ -75,9 +75,9 @@ Run the entire stack — **Nginx, PHP, frontend assets, and MariaDB** — in a s
     - **Username:** `admin`
     - **Password:** `password`
 
-On first start, the container automatically:
+On first start, Docker automatically:
 - Builds frontend assets (Vite)
-- Initializes the MariaDB database
+- Starts a PostgreSQL container (no local DB needed)
 - Runs migrations and seeders
 - Starts Nginx, PHP-FPM, and the queue worker
 
@@ -86,8 +86,8 @@ On first start, the container automatically:
 | Command | Description |
 |---------|-------------|
 | `docker compose up --build -d` | Build and start in the background |
-| `docker compose down` | Stop and remove the container |
-| `docker compose down -v` | Stop and remove container **and** database/storage volumes |
+| `docker compose down` | Stop and remove containers |
+| `docker compose down -v` | Stop and remove containers **and** database/storage volumes |
 | `docker compose logs -f` | Follow application logs |
 | `docker compose exec app php artisan migrate` | Run migrations manually |
 | `docker compose exec app php artisan db:seed` | Run seeders manually |
@@ -99,6 +99,8 @@ Default Docker settings are in `.env.docker` and `docker-compose.yml`:
 | Variable | Default |
 |----------|---------|
 | `APP_PORT` | `8080` |
+| `DB_HOST` | `postgres` (Docker service — not your local machine) |
+| `DB_PORT` | `5432` |
 | `DB_DATABASE` | `inventory` |
 | `DB_USERNAME` | `inventory` |
 | `DB_PASSWORD` | `secret` |
@@ -109,7 +111,7 @@ To use a different port, create a `.env` file in the project root (or export the
 APP_PORT=9000 docker compose up --build -d
 ```
 
-Data is persisted in Docker volumes (`mysql_data`, `storage_data`) so it survives container restarts.
+Data is persisted in Docker volumes (`postgres_data`, `storage_data`) so it survives container restarts.
 
 ---
 
@@ -204,21 +206,19 @@ Have ideas to improve the system? Architecture enhancements, UI tweaks, or bug r
 
 ### Docker architecture
 
-The project ships with a single-container setup managed by Supervisor:
+The project ships with a Docker Compose setup:
 
-| Process | Role |
+| Service | Role |
 |---------|------|
-| **Nginx** | Web server (port 80) |
-| **PHP-FPM** | Laravel backend |
-| **MariaDB** | Database |
-| **Queue worker** | Background jobs |
+| **app** | Nginx + PHP-FPM + Laravel backend + queue worker |
+| **postgres** | PostgreSQL 16 database (runs inside Docker, not on your PC) |
 
 Relevant files:
 
 - `Dockerfile` — multi-stage build (Node for assets, PHP for runtime)
-- `docker-compose.yml` — service definition and volumes
-- `docker/entrypoint.sh` — database init, migrations, and seeding
-- `.env.docker` — environment template for the container
+- `docker-compose.yml` — app and PostgreSQL service definitions
+- `docker/entrypoint.sh` — waits for PostgreSQL, runs migrations and seeding
+- `.env.docker` — environment template for the app container
 
 ## 📄 License
 

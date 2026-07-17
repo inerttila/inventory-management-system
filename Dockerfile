@@ -29,14 +29,13 @@ COPY public ./public
 
 RUN npm run build
 
-# Stage 2: Application runtime (PHP + Nginx + MariaDB)
+# Stage 2: Application runtime (PHP + Nginx)
 FROM php:8.3-fpm-bookworm
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
-    mariadb-server \
     supervisor \
     curl \
     git \
@@ -44,8 +43,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzip-dev \
     libpng-dev \
     libonig-dev \
+    libpq-dev \
     && docker-php-ext-install \
-    pdo_mysql \
+    pdo_pgsql \
+    pgsql \
     mbstring \
     exif \
     pcntl \
