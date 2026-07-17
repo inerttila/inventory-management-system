@@ -44,12 +44,13 @@ php artisan package:discover --ansi --no-interaction
 php artisan config:clear --no-interaction
 php artisan storage:link --force --no-interaction
 
-if [ ! -f storage/.docker-initialized ]; then
-    echo "Running database migrations and seeders..."
-    php artisan migrate --force --seed --no-interaction
-    touch storage/.docker-initialized
+php artisan migrate --force --no-interaction
+
+if php artisan tinker --execute='exit(\App\Models\User::query()->exists() ? 0 : 1);' >/dev/null 2>&1; then
+    echo "Database already seeded."
 else
-    php artisan migrate --force --no-interaction
+    echo "Running database seeders..."
+    php artisan db:seed --force --no-interaction
 fi
 
 chown -R www-data:www-data storage bootstrap/cache
