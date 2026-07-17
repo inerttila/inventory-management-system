@@ -1,5 +1,6 @@
 services:
   app:
+    image: inert/laravel-app:new
     build:
       context: .
       dockerfile: Dockerfile

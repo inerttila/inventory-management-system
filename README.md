@@ -216,7 +216,7 @@ The project ships with a Docker Compose setup:
 Relevant files:
 
 - `Dockerfile` — multi-stage build (Node for assets, PHP for runtime)
-- `docker-compose.yml` — app and PostgreSQL service definitions
+- `docker-compose.yml` — app and PostgreSQL services (`image: inert/laravel-app:new`)
 - `docker/entrypoint.sh` — waits for PostgreSQL, runs migrations and seeding
 - `.env.docker` — environment template for the app container
 
