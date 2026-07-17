@@ -1,7 +1,22 @@
-# Stage 1: Build frontend assets
-FROM node:22-alpine AS frontend
+# Stage 1: Build frontend assets (requires Composer vendor for PowerGrid CSS)
+FROM php:8.2-cli-bookworm AS frontend
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    unzip \
+    gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
+
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 COPY package.json package-lock.json ./
 RUN npm ci
