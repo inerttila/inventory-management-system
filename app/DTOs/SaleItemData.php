@@ -7,8 +7,8 @@ readonly class SaleItemData
     public function __construct(
         public int $product_id,
         public int $quantity,
-        public int $unit_price, // Enforce integer for currency (e.g. Rupiah via casts)
-        public int $discount = 0,
+        public float $unit_price,
+        public float $discount = 0,
     ) {}
 
     public static function fromArray(array $data): self
@@ -16,8 +16,8 @@ readonly class SaleItemData
         return new self(
             product_id: (int) $data['product_id'],
             quantity: (int) $data['quantity'],
-            unit_price: (int) $data['unit_price'],
-            discount: (int) ($data['discount'] ?? 0),
+            unit_price: (float) $data['unit_price'],
+            discount: (float) ($data['discount'] ?? 0),
         );
     }
 

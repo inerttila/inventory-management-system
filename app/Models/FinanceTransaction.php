@@ -26,7 +26,7 @@ class FinanceTransaction extends Model
 
     protected $casts = [
         'transaction_date' => 'date',
-        'amount' => 'integer',
+        'amount' => 'float',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

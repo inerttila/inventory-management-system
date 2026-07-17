@@ -57,7 +57,7 @@ class FinanceTransactionForm extends Component
             'transaction_date' => ['required', 'date'],
             'type' => ['required', 'in:income,expense'],
             'finance_category_id' => ['required', 'exists:finance_categories,id'],
-            'amount' => ['required', 'numeric', 'min:1'],
+            'amount' => ['required', 'numeric', 'min:0.01'],
             'description' => ['nullable', 'string'],
             'external_reference' => ['nullable', 'string', 'max:255'],
         ];
@@ -103,7 +103,7 @@ class FinanceTransactionForm extends Component
         $data = new FinanceTransactionData(
             transaction_date: Carbon::parse($this->transaction_date),
             finance_category_id: (int) $this->finance_category_id,
-            amount: (int) $this->amount,
+            amount: (float) $this->amount,
             description: $this->description,
             external_reference: $this->external_reference,
             created_by: Auth::id() ?? 1, // Fallback for safety, though Auth check should be middleware

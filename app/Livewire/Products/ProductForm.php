@@ -22,8 +22,8 @@ class ProductForm extends Component
     public string $name = '';
     public ?int $category_id = null;
     public ?int $unit_id = null;
-    public int $purchase_price = 0;
-    public int $selling_price = 0;
+    public float $purchase_price = 0;
+    public float $selling_price = 0;
     public int $quantity = 0;
     public int $min_stock = 0;
     public bool $is_active = true;
@@ -90,8 +90,8 @@ class ProductForm extends Component
             ],
             'category_id' => ['required', 'exists:categories,id'],
             'unit_id' => ['required', 'exists:units,id'],
-            'purchase_price' => ['required', 'integer', 'min:0'],
-            'selling_price' => ['required', 'integer', 'min:0'],
+            'purchase_price' => ['required', 'numeric', 'min:0'],
+            'selling_price' => ['required', 'numeric', 'min:0'],
             'quantity' => ['required', 'integer', 'min:0'],
             'min_stock' => ['required', 'integer', 'min:0'],
             'is_active' => ['boolean'],

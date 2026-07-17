@@ -19,9 +19,9 @@ readonly class SaleData
         public ?int $customer_id = null,
         public SaleStatus $status = SaleStatus::COMPLETED,
         public ?string $notes = null,
-        public int $cash_received = 0,
-        public int $change = 0,
-        public int $global_discount = 0,
+        public float $cash_received = 0,
+        public float $change = 0,
+        public float $global_discount = 0,
     ) {}
 
     public static function fromArray(array $data): self
@@ -34,9 +34,9 @@ readonly class SaleData
             customer_id: isset($data['customer_id']) ? (int) $data['customer_id'] : null,
             status: isset($data['status']) ? SaleStatus::from($data['status']) : SaleStatus::COMPLETED,
             notes: $data['notes'] ?? null,
-            cash_received: (int) ($data['cash_received'] ?? 0),
-            change: (int) ($data['change'] ?? 0),
-            global_discount: (int) ($data['global_discount'] ?? 0),
+            cash_received: (float) ($data['cash_received'] ?? 0),
+            change: (float) ($data['change'] ?? 0),
+            global_discount: (float) ($data['global_discount'] ?? 0),
         );
     }
 

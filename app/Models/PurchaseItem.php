@@ -23,9 +23,9 @@ class PurchaseItem extends Model
         'purchase_id' => 'integer',
         'product_id' => 'integer',
         'quantity' => 'integer',
-        'unit_price' => 'integer',
-        'subtotal' => 'integer',
-        'selling_price' => 'integer',
+        'unit_price' => 'float',
+        'subtotal' => 'float',
+        'selling_price' => 'float',
     ];
 
     public function purchase(): BelongsTo
