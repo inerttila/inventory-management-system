@@ -34,17 +34,15 @@ FROM php:8.3-fpm-bookworm
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
     supervisor \
     curl \
     git \
     unzip \
-    libzip-dev \
-    libpng-dev \
-    libonig-dev \
-    libpq-dev \
-    && docker-php-ext-install \
+    && install-php-extensions \
     pdo_pgsql \
     pgsql \
     mbstring \
